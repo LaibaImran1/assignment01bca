@@ -1,7 +1,11 @@
+// Laiba Imran
+// 20i-0991
+// Assignment 1
 package assignment01bca
 
 import (
 	"fmt"
+	"log"
 )
 
 // Blockchain represents the blockchain.
@@ -30,16 +34,15 @@ func (bc *Blockchain) DisplayBlocks() {
 }
 
 // ChangeBlock changes the transaction of the given block.
+// ChangeBlock changes the transaction of the given block by creating a new block with the updated transaction.
 func (bc *Blockchain) ChangeBlock(blockIndex int, newTransaction string, newNonce int) {
 	if blockIndex < 0 || blockIndex >= len(bc.Blocks) {
 		panic("Invalid block index.")
 	}
-	block := bc.Blocks[blockIndex]
-	block.Transaction = newTransaction
-	block.Nonce = newNonce
-	block.CreateHash()
+	previousBlock := bc.Blocks[blockIndex-1]
+	newBlock := NewBlock(newTransaction, newNonce, previousBlock.Hash)
+	bc.Blocks[blockIndex] = newBlock
 }
-
 
 // VerifyChain verifies the integrity of the blockchain.
 func (bc *Blockchain) VerifyChain() bool {
@@ -52,12 +55,16 @@ func (bc *Blockchain) VerifyChain() bool {
 
 		// Verify current block's hash.
 		if currentBlock.Hash != calculatedHash {
+			log.Println("Current hash does not equal calculated hash.")
 			return false
+
 		}
 
 		// Verify previous hash.
 		if currentBlock.PreviousHash != previousBlock.Hash {
+			log.Println("Previous hash does not equal previous block's hash.")
 			return false
+
 		}
 	}
 	return true
